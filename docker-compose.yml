@@ -9,6 +9,22 @@ services:
 #            - node_exporter
 #            - mysqld_exporter
 
+    grafana:
+        image: grafana/grafana
+#        build: ./
+        environment:
+            - GF_SECURITY_ADMIN_PASSWORD=grafana
+            - GF_DASHBOARDS_JSON_ENABLED=true
+            - GF_DASHBOARDS_JSON_PATH=/home/dashboards
+#        depends_on:
+#            - influxdb
+        ports:
+            - 3000:3000
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - /etc/timezone:/etc/timezone:ro
+
+
 #    node_exporter:
 #        image: prom/node-exporter:v0.13.0
 #        restart: always
