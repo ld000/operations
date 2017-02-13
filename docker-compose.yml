@@ -1,41 +1,83 @@
 version: '2'
+
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
+
 services:
-    prometheus:
-        build: ./
-        restart: always
-        ports:
-            - "9090:9090"
-#        depends_on:
-#            - node_exporter
-#            - mysqld_exporter
+  prometheus:
+    image: prom/prometheus
+    restart: always
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '-config.file=/etc/prometheus/prometheus.yml'
+      - '-storage.local.path=/prometheus'
+#      - '-alertmanager.url=http://alertmanager:9093'
+    ports:
+      - "9090:9090"
+    links:
+      - cadvisor:cadvisor
+#      - node-exporter:node-exporter
 
-    grafana:
-#        image: grafana/grafana
-        build: ./grafana
-        environment:
-#            - GF_SECURITY_ADMIN_USER=grafana
-            - GF_SECURITY_ADMIN_PASSWORD=grafana
-            - GF_DASHBOARDS_JSON_ENABLED=true
-            - GF_DASHBOARDS_JSON_PATH=/home/grafana/dashboards
-#        depends_on:
-#            - influxdb
-        ports:
-            - 3000:3000
-        volumes:
-            - /etc/localtime:/etc/localtime:ro
-            - /etc/timezone:/etc/timezone:ro
+  grafana:
+    build: ./grafana
+    environment:
+#      - GF_SECURITY_ADMIN_USER=grafana
+      - GF_SECURITY_ADMIN_PASSWORD=grafana
+      - GF_DASHBOARDS_JSON_ENABLED=true
+      - GF_DASHBOARDS_JSON_PATH=/home/grafana/dashboards
+    links:
+      - prometheus
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana_data:/var/lib/grafana
 
+  alertmanager:
+    image: prom/alertmanager
+    ports:
+      - 9093:9093
+    volumes: 
+      - ./alertmanager/:/etc/alertmanager/
+    command:
+      - '-config.file=/etc/alertmanager/config.yml'
+      - '-storage.path=/alertmanager'
+      
+  cadvisor:
+    image: google/cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    expose:
+      - 8080
 
-#    node_exporter:
-#        image: prom/node-exporter:v0.13.0
-#        restart: always
-#        ports: 
-#            - "9100:9100"
+#  node-exporter:
+#    image: prom/node-exporter:v0.13.0
+#    restart: always
+#    volumes:
+#      - /proc:/host/proc
+#      - /sys:/host/sys
+#      - /:/rootfs
+#    ports: 
+#      - "9100:9100"
+#    network_mode: "host"
+#    command: 
+#      - '-collector.procfs=/host/proc'
+#      - '-collector.sysfs=/host/sys'
+#      - '-collectors.enabled="diskstats,filefd,filesystem,loadavg,meminfo,netdev,stat,time,uname,vmstat"'
+#      - '-collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($|/)"'
 
-#    mysqld_exporter:
-#        image: prom/mysqld-exporter:v0.9.0
-#        restart: always
-#        ports:
-#            - "9104:9104"
-#        environment:
-#            - DATA_SOURCE_NAME="prom:prom@(192.168.1.92:3306)/lingong"
+#    mysqld-exporter:
+#      image: prom/mysqld-exporter:v0.9.0
+#      restart: always
+#      ports:
+#        - "9104:9104"
+#      environment:
+#        - DATA_SOURCE_NAME="prom:prom@(192.168.1.92:3306)/lingong"
+#      command:
+#        - '-collect.binlog_size=true'
+#        - '-collect.info_schema.processlist=true'
