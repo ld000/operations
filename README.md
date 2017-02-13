@@ -5,7 +5,10 @@
 # depends
 
 docker
+
 docker-compose
+
+grafana
 
 mysqld_exporter
 > https://github.com/prometheus/mysqld_exporter
@@ -13,9 +16,9 @@ mysqld_exporter
 node_exporter
 > https://github.com/prometheus/node_exporter
 
-# usage
+# Setup instructions
 
-## start prometheus
+## up docker-compose
 
 ```bash
 docker-compose up
@@ -30,11 +33,14 @@ GRANT PROCESS, REPLICATION CLIENT, SELECT ON *.* TO 'prom'@'%'
 ```
 
 ```bash
-./mysqld_exporter
+./mysqld_exporter -collect.binlog_size=true -collect.info_schema.processlist=true
 ```
 
 ## node_exporter
 
 ```bash
-./node_exporter
+./node_exporter -collectors.enabled="diskstats,filefd,filesystem,loadavg,meminfo,netdev,stat,time,uname,vmstat"
 ```
+
+## Add datasource in Grafana
+![grafana datasource](https://github.com/percona/grafana-dashboards/blob/master/assets/datasource.png)

@@ -10,12 +10,13 @@ services:
 #            - mysqld_exporter
 
     grafana:
-        image: grafana/grafana
-#        build: ./
+#        image: grafana/grafana
+        build: ./grafana
         environment:
+#            - GF_SECURITY_ADMIN_USER=grafana
             - GF_SECURITY_ADMIN_PASSWORD=grafana
             - GF_DASHBOARDS_JSON_ENABLED=true
-            - GF_DASHBOARDS_JSON_PATH=/home/dashboards
+            - GF_DASHBOARDS_JSON_PATH=/home/grafana/dashboards
 #        depends_on:
 #            - influxdb
         ports:
