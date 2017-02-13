@@ -1,0 +1,24 @@
+version: '2'
+services:
+    prometheus:
+        build: ./
+        restart: always
+        ports:
+            - "9090:9090"
+#        depends_on:
+#            - node_exporter
+#            - mysqld_exporter
+
+#    node_exporter:
+#        image: prom/node-exporter:v0.13.0
+#        restart: always
+#        ports: 
+#            - "9100:9100"
+
+#    mysqld_exporter:
+#        image: prom/mysqld-exporter:v0.9.0
+#        restart: always
+#        ports:
+#            - "9104:9104"
+#        environment:
+#            - DATA_SOURCE_NAME="prom:prom@(192.168.1.92:3306)/lingong"
