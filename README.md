@@ -33,6 +33,8 @@ GRANT PROCESS, REPLICATION CLIENT, SELECT ON *.* TO 'prom'@'%'
 ```
 
 ```bash
+export DATA_SOURCE_NAME='login:password@(hostname:port)/'
+
 ./mysqld_exporter -collect.binlog_size=true -collect.info_schema.processlist=true
 ```
 
