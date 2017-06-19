@@ -18,6 +18,13 @@ node_exporter
 
 # Setup instructions
 
+## 
+
+```bash
+chmod +x mysqld_exporter
+chmod +x node_exporter
+```
+
 ## up docker-compose
 
 ```bash
