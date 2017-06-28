@@ -1,6 +1,5 @@
-FROM grafana/grafana:4.1.0
+FROM grafana/grafana:4.3.2
 
-COPY ./dashboards /home/grafana/dashboards
+# COPY ./dashboards /var/lib/grafana/dashboards
 
-RUN chmod -R 777 /home/grafana/dashboards
-
+# RUN chmod -R 777 /home/grafana/dashboards

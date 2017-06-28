@@ -18,7 +18,7 @@ node_exporter
 
 # Setup instructions
 
-## 
+##
 
 ```bash
 chmod +x mysqld_exporter
@@ -53,3 +53,18 @@ export DATA_SOURCE_NAME='login:password@(hostname:port)/'
 
 ## Add datasource in Grafana
 ![grafana datasource](https://github.com/percona/grafana-dashboards/blob/master/assets/datasource.png)
+
+## telegraf
+
+```bash
+# ubuntu
+cd /tmp
+wget https://dl.influxdata.com/telegraf/releases/telegraf_1.3.2-1_amd64.deb
+sudo dpkg -i telegraf_1.3.2-1_amd64.deb
+```
+
+`/etc/telegraf/telegraf.conf`
+
+```
+service telegraf start|stop|restart|status
+```

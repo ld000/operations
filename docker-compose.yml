@@ -5,20 +5,20 @@ volumes:
   grafana_data: {}
 
 services:
-  prometheus:
-    image: prom/prometheus
-    restart: always
-    volumes:
-      - ./prometheus/:/etc/prometheus/
-      - prometheus_data:/prometheus
-    command:
-      - '-config.file=/etc/prometheus/prometheus.yml'
-      - '-storage.local.path=/prometheus'
-#      - '-alertmanager.url=http://alertmanager:9093'
-    ports:
-      - "9090:9090"
-    links:
-      - cadvisor:cadvisor
+#   prometheus:
+#     image: prom/prometheus
+#     restart: always
+#     volumes:
+#       - ./prometheus/:/etc/prometheus/
+#       - prometheus_data:/prometheus
+#     command:
+#       - '-config.file=/etc/prometheus/prometheus.yml'
+#       - '-storage.local.path=/prometheus'
+# #      - '-alertmanager.url=http://alertmanager:9093'
+#     ports:
+#       - "9090:9090"
+#     links:
+#       - cadvisor:cadvisor
 #      - node-exporter:node-exporter
 
   grafana:
@@ -26,34 +26,46 @@ services:
     environment:
 #      - GF_SECURITY_ADMIN_USER=grafana
       - GF_SECURITY_ADMIN_PASSWORD=grafana
-      - GF_DASHBOARDS_JSON_ENABLED=true
-      - GF_DASHBOARDS_JSON_PATH=/home/grafana/dashboards
-    links:
-      - prometheus
+      # - GF_DASHBOARDS_JSON_ENABLED=true
+      # - GF_DASHBOARDS_JSON_PATH=/var/lib/grafana/dashboards
+    # links:
+    #   - prometheus
     ports:
       - 3000:3000
     volumes:
-      - grafana_data:/var/lib/grafana
+      - /var/lib/grafana:/var/lib/grafana
 
-  alertmanager:
-    image: prom/alertmanager
+  influxdb:
+    build: ./influxdb
     ports:
-      - 9093:9093
-    volumes: 
-      - ./alertmanager/:/etc/alertmanager/
-    command:
-      - '-config.file=/etc/alertmanager/config.yml'
-      - '-storage.path=/alertmanager'
-      
-  cadvisor:
-    image: google/cadvisor
+      - 8086:8086
+      - 8083:8083
+      # - 2003:2003
     volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-    expose:
-      - 8080
+      - /var/lib/influxdb:/var/lib/influxdb
+    environment:
+      # - INFLUXDB_GRAPHITE_ENABLED=true
+      - INFLUXDB_ADMIN_ENABLED=true
+
+  # alertmanager:
+  #   image: prom/alertmanager
+  #   ports:
+  #     - 9093:9093
+  #   volumes:
+  #     - ./alertmanager/:/etc/alertmanager/
+  #   command:
+  #     - '-config.file=/etc/alertmanager/config.yml'
+  #     - '-storage.path=/alertmanager'
+  #
+  # cadvisor:
+  #   image: google/cadvisor
+  #   volumes:
+  #     - /:/rootfs:ro
+  #     - /var/run:/var/run:rw
+  #     - /sys:/sys:ro
+  #     - /var/lib/docker/:/var/lib/docker:ro
+  #   expose:
+  #     - 8080
 
 #  node-exporter:
 #    image: prom/node-exporter:v0.13.0
@@ -62,10 +74,10 @@ services:
 #      - /proc:/host/proc
 #      - /sys:/host/sys
 #      - /:/rootfs
-#    ports: 
+#    ports:
 #      - "9100:9100"
 #    network_mode: "host"
-#    command: 
+#    command:
 #      - '-collector.procfs=/host/proc'
 #      - '-collector.sysfs=/host/sys'
 #      - '-collectors.enabled="diskstats,filefd,filesystem,loadavg,meminfo,netdev,stat,time,uname,vmstat"'
